@@ -1,0 +1,322 @@
+Slip No.12
+Write AJAX program to read contact.dat file and print the contents of the file in a tabular
+format when the user clicks on print button. Contact.dat file should contain srno, name,
+residence number, mobile number, Address. [Enter at least 3 record in contact.dat file]
+contact.dat
+1 Isha 65768798 98765432 Nashik
+2 Megha 65235689 87654329 Pune
+contact.html
+<html>
+<head>
+<script type="text/javascript" >
+ function print()
+ {
+ var ob=false;
+ ob=new XMLHttpRequest();
+
+ ob.open("GET","contact.php?");//emailid="+eid);
+ ob.send();
+
+ ob.onreadystatechange=function()
+ {
+ if(ob.readyState==4 && ob.status==200)
+ {
+
+document.getElementById("i").innerHTML=ob.responseText;
+ }
+ }
+ }
+</script>
+</head>
+<body>
+<center>
+<h3>Display the contents of a contact.dat file </h3>
+<br><input type="button" value=Print onclick="print()" >
+<span id="i"></span>
+</center>
+</body>
+</html>
+contact.php
+<?php
+ $fp = fopen('contact.dat','r');
+ echo "<table border=1>";
+ echo "<tr><th>Sr. No.</th><th>Name</th><th>Residence No.</th><th>Mob.
+no.</th><th>Address</th></tr>";
+ while($row = fscanf($fp,"%s %s %s %s %s"))
+ {
+ echo "<tr>";
+ foreach($row as $r)
+ {
+ echo "<td>$r</td>";
+ }
+ echo "</tr>";
+ }
+ echo "</table>";
+ fclose($fp);
+?>
+Slip No.13
+Write AJAX program where the user is requested to write his or her name in a text box, and
+the server keeps sending back responses while the user is typing. If the user name is not
+entered then the message displayed will be, “Stranger, please tell me your name!”. If the name
+is Rohit, Virat, Dhoni, Ashwin or Harbhajan , the server responds with “Hello, master !”. If
+the name is anything else, the message will be “, I don’t know you!”
+slip13.html
+<html>
+<head>
+<title>AJAX Example</title>
+<script>
+function sendRequest() {
+var name = document.getElementById("name").value;
+var message = document.getElementById("message");
+if (name == "") {
+message.innerHTML = "Stranger, please tell me your name!";
+} else {
+var ob = new XMLHttpRequest();
+ob.onreadystatechange = function() {
+if (this.readyState == 4 && this.status == 200) {
+if (this.responseText == "Hello, master !") {
+message.innerHTML = "Hello, master !";
+} else {
+message.innerHTML = name + ", I don't
+know you!";
+}
+}
+};
+ob.open("GET", "st.php?name=" + name, true);
+ob.send();
+}
+}
+</script>
+</head>
+<body>
+<h1>AJAX Example</h1>
+<input type="text" id="name" onkeyup="sendRequest()">
+<p id="message"></p>
+</body>
+</html>
+slip13.php
+<?php
+$name = $_GET["name"];
+if ($name == "")
+{
+ echo "";
+}
+else if ($name == "Rohit" || $name == "Virat" || $name == "Dhoni" || $name == "Ashwin" ||
+$name == "Harbhajan")
+{
+ echo "Hello, master !";
+}
+else
+{
+ echo "";
+}
+?>
+Slip No.14
+Create TEACHER table as follows TEACHER(tno, tname, qualification, salary). Write Ajax
+program to select a teachers name and print the selected teachers details.
+teacher.html
+<html>
+<script type="text/javascript">
+function display()
+{
+ ob = new XMLHttpRequest();
+ ob.open("GET","teacher.php");
+ ob.send();
+ ob.onreadystatechange = function()
+ {
+ if(ob.readyState == 4 && ob.status == 200)
+ document.getElementById("i").innerHTML = ob.responseText;
+ }
+}
+</script>
+<body>
+<h2>DISPLAY INFORMATION OF TEACHER</h2>
+<input type=submit value="DISPLAY INFORMATION" onclick=display()>
+<span id=i></span>
+</body>
+</html>
+teacher.php
+<?php
+$con_string="host=localhost dbname=madhuri port=5432 user=postgres password=1234";
+$con = pg_connect($con_string);
+$q = "select * from teacher;";
+$rs = pg_query($con,$q) or die("Cannot Execute query");
+echo"<table border=1>";
+echo"<tr><th>Teacher No</th><th>Teacher
+Name</th><th>Qualification</th><th>Salary</th></tr>";
+while($row = pg_fetch_array($rs))
+{
+ echo"<tr><td>".$row['tno']."</td>";
+ echo"<td>".$row['tname']."</td>";
+ echo"<td>".$row['qualification']."</td>";
+ echo"<td>".$row['salary']."</td></tr>";
+
+ }
+
+ echo"</table>";
+ ?>
+Slip No.15
+Write Ajax program to fetch suggestions when is user is typing in a textbox. (eg like google
+suggestions. Hint create array of suggestions and matching string will be displayed)
+Slip15.html
+<html>
+<head>
+<script type="text/javascript" >
+ function m1(str)
+ {
+ var ob=false;
+ ob=new XMLHttpRequest();
+ ob.open("GET","slip15.php?q="+str);
+ ob.send();
+
+ ob.onreadystatechange=function()
+ {
+ if(ob.readyState==4 && ob.status==200)
+
+document.getElementById("a").innerHTML=ob.responseText;
+ }
+ }
+</script>
+</head>
+<body>
+<form>
+Enter Name Of Student :<input type=text name=search size="20"
+onkeyup="m1(form.search.value)">
+<input type=button value="submit" >
+</form>
+suggestions :<span id="a"></span><br>
+</body>
+</html>
+slip15.php
+<?php
+$a=array("RAMESH","SURESH","RAJ","SEEMA","PUJA","SIYA","AJAY","SAMEER
+","VIJAY","VINAY","VIRAJ");
+ $q=$_GET['q'];
+
+ if(strlen($q)>0)
+ {
+ $match="";
+ for($i=0;$i<count($a);$i++)
+ {
+ if(strtolower($q)==strtolower(substr($a[$i],0,strlen($q))))
+ {
+ if($match=="")
+ {
+ $match=$a[$i];
+ }
+ else
+ {
+ $match=$match.",".$a[$i];
+ }
+ }
+ }
+
+ if($match=="")
+ {
+ echo "No Suggestions";
+ }
+ else
+ {
+ echo $match;
+ }
+ }
+?>
+Slip No.16
+Write Ajax program to get book details from XML file when user select a book name. Create
+XMLfile for storing details of book(title, author, year, price).
+book.html
+<html>
+<head>
+<script type="text/javascript" >
+ function print(str)
+ {
+ var ob=false;
+ ob=new XMLHttpRequest();
+
+ ob.open("GET","book.php?q="+str);//emailid="+eid);
+ ob.send();
+
+ ob.onreadystatechange=function()
+ {
+ if(ob.readyState==4 && ob.status==200)
+ {
+
+document.getElementById("i").innerHTML=ob.responseText;
+ }
+ }
+ }
+</script>
+</head>
+<body>
+<form>
+List of book titles:
+<select name="Book_Title" onChange="print(this.value)">
+<option value="Networking"> Networking</option>
+<option value="php"> PHP</option>
+<option value="java">JAVA</option>
+</select>
+</form>
+<div id="i">Book details will be given here</div>
+</body>
+</html>
+book.xml
+<Bookinfo>
+<Book>
+<Book_Title>Networking</Book_Title>
+<Book_Author>400</Book_Author>
+<Book_PubYear>2015</Book_PubYear>
+<Book_Price>450</Book_Price>
+</Book>
+<Book>
+<Book_Title>php</Book_Title>
+<Book_Author>400</Book_Author>
+<Book_PubYear>2015</Book_PubYear>
+<Book_Price>450</Book_Price>
+</Book>
+<Book>
+<Book_Title>java</Book_Title>
+<Book_Author>400</Book_Author>
+<Book_PubYear>2015</Book_PubYear>
+<Book_Price>450</Book_Price>
+</Book>
+</Bookinfo>
+book.php
+<?php
+$q=$_GET['q'];
+$dom=new DOMDocument();
+$dom->load("book.xml");
+echo"<b>Book name</b>";
+echo"<br>";
+$x=$dom->getElementsByTagName("Book_Title");
+for($i=0;$i<=$x->length-1;$i++)
+{
+ if($x->item($i)->nodeType==1)
+ {
+ if($x->item($i)->childNodes->item(0)->nodeValue==$q)
+ {
+ $y=($x->item($i)->parentNode);
+ }
+ }
+}
+$book=($y->childNodes);
+for($i=0;$i<$book->length;$i++)
+{
+ if($book->item($i)->nodeType==1)
+ {
+ echo($book->item($i)->nodeName);
+ echo(":");
+ echo($book->item($i)->childNodes->item(0)->nodeValue);
+ echo("<br>");
+ }
+}
+?>
+Slip No.26
+Create employee table as follows EMP (eno, ename, designation, salary). Write Ajax program
+to select the employees name and print the selected employee’s details.
+Slip No.27
+Create web Application that contains Voters details and check proper validation for (name,
+age, and nationality), as Name should be in upper case letters only, Age should not be less than
+18 yrs and Nationality should be Indian.(use HTML-AJAX-PHP)
+Slip No.28
+Write a PHP script using AJAX concept, to check user name and password are valid or
+Invalid (use database to store user name and password)
